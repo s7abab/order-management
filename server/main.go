@@ -10,13 +10,14 @@ import (
 
 func main() {
 
-	// Connect to the database and migrate models
+	// inii database connection and migrate models
 	db.InitDb()
 
-	// Register the handler for the API endpoint
-	http.HandleFunc("/order", handler.ItemHandler)
+	// endpoints
+	http.HandleFunc("/api/v1/order", handler.OrderHandler)
+	http.HandleFunc("/api/v1/orders", handler.GetOrders)
 
-	// Start the server
-	fmt.Println("Server is listening on port 8080...")
+	// start the server
+	fmt.Println("Server is listening on port 8080 🪄")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

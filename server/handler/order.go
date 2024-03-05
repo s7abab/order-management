@@ -10,13 +10,14 @@ import (
 	"strconv"
 )
 
-func ItemHandler(w http.ResponseWriter, r *http.Request) {
+// handle requests by http methods
+func OrderHandler(w http.ResponseWriter, r *http.Request) {
 	// Set response content type
 	w.Header().Set("Content-Type", "application/json")
 
 	switch r.Method {
 	case "GET":
-		GetOrdersHandler(w, r)
+		getOrder(w, r)
 	case "POST":
 		createOrder(w, r)
 	case "PATCH":
@@ -77,8 +78,44 @@ func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Order status updated successfully")
 }
 
+// get one order (GET
+func getOrder(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+
+	// validation
+	if id == "" {
+		http.Error(w, "Order id is required", http.StatusBadRequest)
+		return
+	}
+
+	// convert order ID to uint
+	_, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	// retrieve the order from the database
+	order, err := db.GetOrderByID(id)
+	if err != nil {
+		http.Error(w, "Failed to retrieve order", http.StatusInternalServerError)
+		return
+	}
+
+	// convert order to JSON
+	jsonOrder, err := json.Marshal(order)
+	if err != nil {
+		http.Error(w, "Failed to convert order to JSON", http.StatusInternalServerError)
+		return
+	}
+
+	// write JSON response
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonOrder)
+}
+
 // get orders (GET)
-func GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
+func GetOrders(w http.ResponseWriter, r *http.Request) {
 	// parse params
 	filters := make(map[string]interface{})
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
