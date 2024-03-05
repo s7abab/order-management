@@ -14,7 +14,7 @@ import (
 func OrderHandler(w http.ResponseWriter, r *http.Request) {
 	// Set response content type
 	w.Header().Set("Content-Type", "application/json")
-
+	fmt.Println(r.Method)
 	switch r.Method {
 	case "GET":
 		getOrder(w, r)
@@ -57,11 +57,11 @@ func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 
 	// validation
 	if id == "" {
-		http.Error(w, "Order id is required", http.StatusBadRequest)
+		http.Error(w, "order id is required", http.StatusBadRequest)
 		return
 	}
 	if status == "" {
-		http.Error(w, "Order status is required", http.StatusBadRequest)
+		http.Error(w, "order status is required", http.StatusBadRequest)
 		return
 	}
 

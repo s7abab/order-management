@@ -35,7 +35,7 @@ func UpdateOrderStatus(id string, status string) error {
 func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy string, sortOrder string) ([]models.Order, error) {
 	db := GetDb()
 
-	query := db.Model(&models.Order{})
+	query := db.Model(&models.Order{}).Preload("Items")
 
 	// Apply filters
 	for key, value := range filters {

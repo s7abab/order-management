@@ -1,38 +1,24 @@
 "use client";
-
-import { getOrders } from "@/api/orderApi";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-
   const router = useRouter();
 
   const handleRoute = () => {
     router.push("/addorder");
   };
 
-  const handleOrderAdd = (newOrder) => {
-    setOrders([...orders, newOrder]);
+  const fetchOrders = async () => {
+    const res = await axios.get(
+      `http://localhost:8080/api/v1/orders?page=1&pageSize=10&sortBy=total&sortOrder=DESC&status=PENDING`
+    );
+    setOrders(res.data);
   };
-  const order = {
-    id: "1",
-    status: "PENDING",
-    items: [
-      {
-        id: "123456",
-        description: "a product description",
-        price: 12.4,
-        quantity: 1,
-      },
-    ],
-    total: 12.4,
-    currencyUnit: "USD",
-  };
-
   useEffect(() => {
-    getOrders();
+    fetchOrders();
   }, []);
   return (
     <div className="w-screen h-screen p-4 bg-white rounded-lg shadow-md">
@@ -53,19 +39,21 @@ const Orders = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="border px-4 py-2 text-center">{order.id}</td>
-            <td className="border px-4 py-2 text-center">{order.status}</td>
-            <td className="border px-4 py-2 text-center">{order.total}</td>
-            <td className="border px-4 py-2 text-center">
-              {order.currencyUnit}
-            </td>
-            <td className="border px-4 py-2 flex justify-center items-center">
-              <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
-                View
-              </button>
-            </td>
-          </tr>
+          {orders?.map((order, index) => (
+            <tr key={order?.ID}>
+              <td className="border px-4 py-2 text-center">{index+1}</td>
+              <td className="border px-4 py-2 text-center">{order?.status}</td>
+              <td className="border px-4 py-2 text-center">{order?.total}</td>
+              <td className="border px-4 py-2 text-center">
+                {order?.currencyUnit}
+              </td>
+              <td className="border px-4 py-2 flex justify-center items-center">
+                <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                  View
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

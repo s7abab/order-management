@@ -1,17 +1,23 @@
 "use client";
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import AddProduct from "./AddProduct";
 import ProductCard from "./ProductCard";
+import { useRouter } from "next/navigation";
 
 const AddOrder = () => {
   const [modal, setModal] = useState(false);
   const [order, setOrder] = useState({
-    status: "pending", // Set default status to pending
+    status: "pending",
     products: [],
-    total: 0, // Initialize total to 0
-    currencyUnit: "inr", // Set default currency to INR
+    total: 0,
+    currencyUnit: "inr",
   });
-
+  // navigate to home
+  const router = useRouter();
+  const handleNavigate = () => {
+    router.push("/");
+  };
   const handleModalOpen = () => {
     setModal(!modal);
   };
@@ -53,12 +59,22 @@ const AddOrder = () => {
     }));
   };
 
-  const handleAddOrder = () => {
-    console.log("Order:", order);
+  // craete order
+  const handleAddOrder = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8080/api/v1/order`, {
+        status: order.status,
+        total: order.total,
+        currencyUnit: order.currencyUnit,
+        items: order.products,
+      });
+      handleNavigate();
+    } catch (error) {
+      console.error("Error adding order:", error);
+    }
   };
-
   return (
-    <div className="">
+    <>
       <button
         onClick={handleModalOpen}
         className="p-2 w-[130px] bg-gray-700 text-white mt-4 mx-4 rounded-md"
@@ -85,7 +101,10 @@ const AddOrder = () => {
         <option value="usd">USD</option>
         <option value="inr">INR</option>
       </select>
-      <button className="p-2 w-[130px] bg-violet-600 text-white mt-4 mx-4 rounded-md">
+      <button
+        onClick={handleAddOrder}
+        className="p-2 w-[130px] bg-violet-600 text-white mt-4 mx-4 rounded-md"
+      >
         Submit Order
       </button>
       <div>Total: {order.total}</div>
@@ -95,7 +114,7 @@ const AddOrder = () => {
           <ProductCard key={index} product={item} />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 
