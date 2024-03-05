@@ -15,6 +15,8 @@ func ItemHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	switch r.Method {
+	case "GET":
+		GetOrdersHandler(w, r)
 	case "POST":
 		createOrder(w, r)
 	case "PATCH":
@@ -24,7 +26,7 @@ func ItemHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Create order
+// Create order (POST)
 func createOrder(w http.ResponseWriter, r *http.Request) {
 	var newOrder models.Order
 
@@ -46,7 +48,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "New order created successfully")
 }
 
-// update order
+// update order (PATCH)
 func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	// Parse order id and status from url parameter
 	id := r.URL.Query().Get("id")
@@ -54,18 +56,18 @@ func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 
 	// validation
 	if id == "" {
-		http.Error(w, "Order ID is required", http.StatusBadRequest)
+		http.Error(w, "Order id is required", http.StatusBadRequest)
 		return
 	}
 	if status == "" {
-		http.Error(w, "Order Status is required", http.StatusBadRequest)
+		http.Error(w, "Order status is required", http.StatusBadRequest)
 		return
 	}
 
 	// Convert order ID to uint
 	_, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid Order ID", http.StatusBadRequest)
+		http.Error(w, "Invalid order id", http.StatusBadRequest)
 		return
 	}
 
@@ -73,4 +75,32 @@ func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with a success message
 	fmt.Fprintf(w, "Order status updated successfully")
+}
+
+// get orders (GET)
+func GetOrdersHandler(w http.ResponseWriter, r *http.Request) {
+	// parse params
+	filters := make(map[string]interface{})
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	pageSize, _ := strconv.Atoi(r.URL.Query().Get("pageSize"))
+	sortBy := r.URL.Query().Get("sortBy")
+	sortOrder := r.URL.Query().Get("sortOrder")
+
+	// Retrieve orders
+	orders, err := db.GetOrders(filters, page, pageSize, sortBy, sortOrder)
+	if err != nil {
+
+		http.Error(w, "Failed to retrieve orders", http.StatusInternalServerError)
+		return
+	}
+
+	// Convert orders to JSON
+	jsonOrders, err := json.Marshal(orders)
+	if err != nil {
+		http.Error(w, "Failed to convert orders to json", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonOrders)
 }
