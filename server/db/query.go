@@ -66,12 +66,11 @@ func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy st
 }
 
 // get order by id (GET)
-
 func GetOrderByID(id string) (*models.Order, error) {
 	db := GetDb()
 
 	var order models.Order
-	if err := db.First(&order, id).Error; err != nil {
+	if err := db.Preload("Items").First(&order, id).Error; err != nil {
 		fmt.Println("Error retrieving order:", err)
 		return nil, err
 	}

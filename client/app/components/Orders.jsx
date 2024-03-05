@@ -1,6 +1,21 @@
-import React from "react";
+"use client";
+
+import { getOrders } from "@/api/orderApi";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const Orders = () => {
+  const [orders, setOrders] = useState([]);
+
+  const router = useRouter();
+
+  const handleRoute = () => {
+    router.push("/addorder");
+  };
+
+  const handleOrderAdd = (newOrder) => {
+    setOrders([...orders, newOrder]);
+  };
   const order = {
     id: "1",
     status: "PENDING",
@@ -16,8 +31,17 @@ const Orders = () => {
     currencyUnit: "USD",
   };
 
+  useEffect(() => {
+    getOrders();
+  }, []);
   return (
     <div className="w-screen h-screen p-4 bg-white rounded-lg shadow-md">
+      <button
+        onClick={handleRoute}
+        className="p-2 w-[100px] bg-gray-700 text-white m-4 mx-4 rounded-md"
+      >
+        Add Order
+      </button>
       <table className="w-full table-auto">
         <thead>
           <tr className="bg-gray-200">
