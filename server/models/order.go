@@ -14,8 +14,8 @@ type Order struct {
 
 type OrderItem struct {
 	gorm.Model
-	OrderID     uint    `json:"-"`
-	Order       Order   `json:"order"`
+	OrderID     uint    `gorm:"index"` // Foreign key
+	Order       Order   `gorm:"foreignKey:OrderID"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
 	Quantity    int     `json:"quantity"`
