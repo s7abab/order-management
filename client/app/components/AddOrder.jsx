@@ -76,6 +76,9 @@ const AddOrder = () => {
   };
   return (
     <>
+      <div className="flex justify-center text-2xl font-bold mt-2">
+        Total: {order.total}
+      </div>
       <button
         onClick={handleModalOpen}
         className="p-2 w-[130px] bg-gray-700 text-white mt-4 mx-4 rounded-md"
@@ -110,7 +113,7 @@ const AddOrder = () => {
       >
         Submit Order
       </button>
-      <div>Total: {order.total}</div>
+
       {modal && (
         <AddProduct close={handleModalOpen} setProduct={handleAddProducts} />
       )}

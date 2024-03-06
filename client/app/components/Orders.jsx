@@ -4,9 +4,11 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Status from "./Status";
 import Filter from "./Filter";
+import Products from "./Products";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     currencyUnit: "",
@@ -14,21 +16,28 @@ const Orders = () => {
     sortBy: "total",
     sortOrder: "DESC",
   });
+  const [view, setView] = useState(false);
 
-  const [totalPages, setTotalPages] = useState(1)
+  const [totalPages, setTotalPages] = useState(1);
 
-  const router = useRouter();
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
     }));
   };
-
+  // handle navigation
+  const router = useRouter();
   const handleRoute = () => {
     router.push("/addorder");
   };
+  //toggle view
+  const toggleView = (order) => {
+    setProducts(order.items);
+    setView(!view);
+  };
 
+  // pagination
   const goToPage = (pageNumber) => {
     setPage(pageNumber);
   };
@@ -49,7 +58,7 @@ const Orders = () => {
     const res = await axios.get(
       `http://localhost:8080/api/v1/orders?page=${page}&pageSize=7&sortBy=${filters.sortBy}&sortOrder=${filters.sortOrder}&currencyUnit=${filters.currencyUnit}&status=${filters.status}`
     );
-    setTotalPages(res.data.totalPages)
+    setTotalPages(res.data.totalPages);
     setOrders(res.data.orders);
   };
 
@@ -93,7 +102,10 @@ const Orders = () => {
                 {order?.currencyUnit}
               </td>
               <td className="border px-4 py-2 flex justify-center items-center">
-                <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                <button
+                  onClick={() => toggleView(order)}
+                  className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded"
+                >
                   View
                 </button>
               </td>
@@ -130,6 +142,7 @@ const Orders = () => {
           Next
         </button>
       </div>
+      {view && <Products products={products} close={toggleView} />}
     </div>
   );
 };
