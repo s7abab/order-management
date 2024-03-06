@@ -1,5 +1,6 @@
 package handler
 
+// Importing necessary packages
 import (
 	"encoding/json"
 	"fmt"
@@ -7,10 +8,11 @@ import (
 
 	"orders/db"
 	"orders/models"
+	"orders/validations"
 	"strconv"
 )
 
-// handle requests by http methods
+// Handle requests based on HTTP methods
 func OrderHandler(w http.ResponseWriter, r *http.Request) {
 	// Set response content type
 	w.Header().Set("Content-Type", "application/json")
@@ -27,20 +29,26 @@ func OrderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Create order (POST)
+// Create order handler (POST
 func createOrder(w http.ResponseWriter, r *http.Request) {
 	var newOrder models.Order
 
 	// Decode the request body into the newOrder struct
 	err := json.NewDecoder(r.Body).Decode(&newOrder)
 	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate the newOrder
+	if err := validations.ValidateOrder(newOrder); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Insert into database
 	if err := db.InsertOrder(&newOrder); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to insert order into database", http.StatusInternalServerError)
 		return
 	}
 
@@ -49,7 +57,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "New order created successfully")
 }
 
-// update order (PATCH)
+// update order handler (PUT)
 func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	// Parse order id and status from url parameter
 	fmt.Println(r.URL.Query())
@@ -79,44 +87,43 @@ func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Order status updated successfully")
 }
 
-// get one order (GET
+// Get single order handler (GET)
 func getOrder(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
-	// validation
+	// Validation
 	if id == "" {
 		http.Error(w, "Order id is required", http.StatusBadRequest)
 		return
 	}
 
-	// convert order ID to uint
+	// Convert order ID to uint
 	_, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid order id", http.StatusBadRequest)
 		return
 	}
 
-	// retrieve the order from the database
+	// Retrieve the order from the database
 	order, err := db.GetOrderByID(id)
 	if err != nil {
 		http.Error(w, "Failed to retrieve order", http.StatusInternalServerError)
 		return
 	}
 
-	// convert order to JSON
+	// Convert order to JSON
 	jsonOrder, err := json.Marshal(order)
 	if err != nil {
 		http.Error(w, "Failed to convert order to JSON", http.StatusInternalServerError)
 		return
 	}
 
-	// write JSON response
+	// Write JSON response
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonOrder)
 }
 
-// get orders (GET)
-
+// Get orders handler (GET)
 func GetOrders(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))

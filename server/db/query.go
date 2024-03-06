@@ -6,7 +6,7 @@ import (
 	"orders/models"
 )
 
-// insert order (POST)
+// Insert order in to db
 func InsertOrder(data *models.Order) error {
 	db := GetDb()
 
@@ -18,19 +18,20 @@ func InsertOrder(data *models.Order) error {
 	return nil
 }
 
-// update order status (PATCH)
+// Update order status
 func UpdateOrderStatus(id string, status string) error {
 	db := GetDb()
 	order := models.Order{}
 	db.First(&order, "id = ?", id)
 	fmt.Println(order)
 
-	// update
+	// Update
 	order.Status = status
 	db.Save(&order)
 	return nil
 }
 
+// Fetch orders from db
 func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy string, sortOrder string) ([]models.Order, int, error) {
 	db := GetDb()
 
@@ -80,7 +81,7 @@ func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy st
 	return orders, totalPages, nil
 }
 
-// get order by id (GET)
+// Get order by id
 func GetOrderByID(id string) (*models.Order, error) {
 	db := GetDb()
 

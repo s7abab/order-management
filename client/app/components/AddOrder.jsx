@@ -70,6 +70,7 @@ const AddOrder = () => {
       });
       handleNavigate();
     } catch (error) {
+      alert("Error adding order: " + error.response.data);
       console.error("Error adding order:", error);
     }
   };
