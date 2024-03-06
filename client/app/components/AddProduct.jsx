@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 
-const AddProduct = ({ setProduct }) => {
+const AddProduct = ({ close, setProduct }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -23,6 +23,9 @@ const AddProduct = ({ setProduct }) => {
 
   return (
     <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 px-8 bg-white rounded-lg shadow-md">
+      <button className="font-semibold" onClick={close}>
+        X
+      </button>
       <h2 className="text-xl font-semibold mb-4">Add Product</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">

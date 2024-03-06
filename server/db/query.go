@@ -31,7 +31,6 @@ func UpdateOrderStatus(id string, status string) error {
 	return nil
 }
 
-// get orders (GET)
 func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy string, sortOrder string) ([]models.Order, error) {
 	db := GetDb()
 
@@ -39,7 +38,14 @@ func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy st
 
 	// Apply filters
 	for key, value := range filters {
-		query = query.Where(fmt.Sprintf("%s = ?", key), value)
+		switch key {
+		case "status":
+			query = query.Where("status = ?", value)
+		case "currencyUnit":
+			query = query.Where("currency_unit = ?", value)
+		default:
+			query = query.Where(fmt.Sprintf("%s = ?", key), value)
+		}
 	}
 
 	// Apply sorting

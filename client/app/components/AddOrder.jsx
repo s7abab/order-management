@@ -86,6 +86,7 @@ const AddOrder = () => {
         id="status"
         value={order.status}
         onChange={handleStatusChange}
+        className=" w-[200px] bg-white border border-gray-300 rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
       >
         <option value="pending">Pending</option>
         <option value="delivered">Delivered</option>
@@ -97,6 +98,7 @@ const AddOrder = () => {
         id="currencyUnit"
         value={order.currencyUnit}
         onChange={handleCurrencyUnitChange}
+        className="mx-5 w-[200px] bg-white border border-gray-300 rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
       >
         <option value="usd">USD</option>
         <option value="inr">INR</option>
@@ -108,7 +110,9 @@ const AddOrder = () => {
         Submit Order
       </button>
       <div>Total: {order.total}</div>
-      {modal && <AddProduct setProduct={handleAddProducts} />}
+      {modal && (
+        <AddProduct close={handleModalOpen} setProduct={handleAddProducts} />
+      )}
       <div className="mx-5 mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {order.products.map((item, index) => (
           <ProductCard key={index} product={item} />

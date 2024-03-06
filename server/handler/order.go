@@ -20,7 +20,7 @@ func OrderHandler(w http.ResponseWriter, r *http.Request) {
 		getOrder(w, r)
 	case "POST":
 		createOrder(w, r)
-	case "PATCH":
+	case "PUT":
 		updateOrderStatus(w, r)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -52,6 +52,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 // update order (PATCH)
 func updateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	// Parse order id and status from url parameter
+	fmt.Println(r.URL.Query())
 	id := r.URL.Query().Get("id")
 	status := r.URL.Query().Get("status")
 
@@ -116,17 +117,27 @@ func getOrder(w http.ResponseWriter, r *http.Request) {
 
 // get orders (GET)
 func GetOrders(w http.ResponseWriter, r *http.Request) {
-	// parse params
-	filters := make(map[string]interface{})
+	// Parse query parameters
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	pageSize, _ := strconv.Atoi(r.URL.Query().Get("pageSize"))
 	sortBy := r.URL.Query().Get("sortBy")
 	sortOrder := r.URL.Query().Get("sortOrder")
+	status := r.URL.Query().Get("status")
+	currencyUnit := r.URL.Query().Get("currencyUnit")
+
+	fmt.Println(currencyUnit)
+	// Create filters map
+	filters := make(map[string]interface{})
+	if status != "" {
+		filters["status"] = status
+	}
+	if currencyUnit != "" {
+		filters["currencyUnit"] = currencyUnit
+	}
 
 	// Retrieve orders
 	orders, err := db.GetOrders(filters, page, pageSize, sortBy, sortOrder)
 	if err != nil {
-
 		http.Error(w, "Failed to retrieve orders", http.StatusInternalServerError)
 		return
 	}
