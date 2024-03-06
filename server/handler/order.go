@@ -116,6 +116,7 @@ func getOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // get orders (GET)
+
 func GetOrders(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
@@ -125,7 +126,6 @@ func GetOrders(w http.ResponseWriter, r *http.Request) {
 	status := r.URL.Query().Get("status")
 	currencyUnit := r.URL.Query().Get("currencyUnit")
 
-	fmt.Println(currencyUnit)
 	// Create filters map
 	filters := make(map[string]interface{})
 	if status != "" {
@@ -136,19 +136,27 @@ func GetOrders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieve orders
-	orders, err := db.GetOrders(filters, page, pageSize, sortBy, sortOrder)
+	orders, totalPages, err := db.GetOrders(filters, page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		http.Error(w, "Failed to retrieve orders", http.StatusInternalServerError)
 		return
 	}
 
-	// Convert orders to JSON
-	jsonOrders, err := json.Marshal(orders)
+	// Convert orders and total pages to JSON
+	response := struct {
+		Orders     []models.Order `json:"orders"`
+		TotalPages int            `json:"totalPages"`
+	}{
+		Orders:     orders,
+		TotalPages: totalPages,
+	}
+
+	jsonResponse, err := json.Marshal(response)
 	if err != nil {
-		http.Error(w, "Failed to convert orders to json", http.StatusInternalServerError)
+		http.Error(w, "Failed to convert response to JSON", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonOrders)
+	w.Write(jsonResponse)
 }
