@@ -1,0 +1,16 @@
+# Binaries for compiled code
+*.exe
+*.out
+*.a
+
+# Test binaries 
+*.test
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Other generated files or directories
+/build/
