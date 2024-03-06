@@ -1,5 +1,6 @@
 package main
 
+// Importing necessary packages
 import (
 	"fmt"
 	"log"
@@ -11,14 +12,14 @@ import (
 )
 
 func main() {
-	// initialize database connection and migrate models
+	// Initialize database connection and migrate models
 	db.InitDb()
 
-	// handlers
+	// API Request Handlers
 	http.HandleFunc("/api/v1/order", handler.OrderHandler)
 	http.HandleFunc("/api/v1/orders", handler.GetOrders)
 
-	// cors handlers
+	// Cors
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -26,10 +27,10 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	// apply cors to all routes
+	// Apply cors to all routes
 	handler := c.Handler(http.DefaultServeMux)
 
-	// start the server
+	// Start the server
 	fmt.Println("Server is listening on port 8080 🪄")
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }

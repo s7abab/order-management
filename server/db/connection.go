@@ -19,7 +19,7 @@ func InitDb() (*gorm.DB, error) {
 	}
 
 	DB = db
-
+	// Auto migrate tables
 	err = db.AutoMigrate(
 		&models.Order{},
 		&models.OrderItem{},

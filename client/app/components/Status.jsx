@@ -20,8 +20,18 @@ const Status = ({ order, fetchOrder }) => {
     }
   };
   return (
-    <div className="flex justify-center items-center gap-5">
-      {order?.status}{" "}
+    <div className="flex justify-center items-center gap-5 ">
+   <div 
+  className={`
+     w-[100px] text-center rounded-full 
+     ${order?.status === 'pending' ? 'bg-yellow-500' : 
+       order?.status === 'delivered' ? 'bg-green-500' : 
+       'bg-red-500'
+     }`}
+>
+  {order?.status} 
+</div>
+
       <div onClick={toggleOpen} className="cursor-pointer ">
         <MdExpandMore size={25} />
         <div className="absolute bg-gray-400 rounded-md">

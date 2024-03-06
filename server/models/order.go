@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Order struct
 type Order struct {
 	gorm.Model
 	Status       string      `json:"status"`
@@ -12,6 +13,7 @@ type Order struct {
 	Items        []OrderItem `json:"items"`
 }
 
+// Order items struct
 type OrderItem struct {
 	gorm.Model
 	OrderID     uint   `json:"orderId" gorm:"index"` // Foreign key

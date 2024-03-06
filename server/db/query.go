@@ -2,11 +2,11 @@ package db
 
 import (
 	"fmt"
-
+	"math"
 	"orders/models"
 )
 
-// insert order (POST)
+// Insert order in to db
 func InsertOrder(data *models.Order) error {
 	db := GetDb()
 
@@ -18,20 +18,21 @@ func InsertOrder(data *models.Order) error {
 	return nil
 }
 
-// update order status (PATCH)
+// Update order status
 func UpdateOrderStatus(id string, status string) error {
 	db := GetDb()
 	order := models.Order{}
 	db.First(&order, "id = ?", id)
 	fmt.Println(order)
 
-	// update
+	// Update
 	order.Status = status
 	db.Save(&order)
 	return nil
 }
 
-func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy string, sortOrder string) ([]models.Order, error) {
+// Fetch orders from db
+func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy string, sortOrder string) ([]models.Order, int, error) {
 	db := GetDb()
 
 	query := db.Model(&models.Order{}).Preload("Items")
@@ -46,6 +47,13 @@ func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy st
 		default:
 			query = query.Where(fmt.Sprintf("%s = ?", key), value)
 		}
+	}
+
+	// Execute count query to get total number of orders
+	var totalCount int64
+	if err := query.Count(&totalCount).Error; err != nil {
+		fmt.Println("Error counting orders:", err)
+		return nil, 0, err
 	}
 
 	// Apply sorting
@@ -65,13 +73,15 @@ func GetOrders(filters map[string]interface{}, page int, pageSize int, sortBy st
 	var orders []models.Order
 	if err := query.Find(&orders).Error; err != nil {
 		fmt.Println("Error retrieving orders:", err)
-		return nil, err
+		return nil, 0, err
 	}
 
-	return orders, nil
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+
+	return orders, totalPages, nil
 }
 
-// get order by id (GET)
+// Get order by id
 func GetOrderByID(id string) (*models.Order, error) {
 	db := GetDb()
 
